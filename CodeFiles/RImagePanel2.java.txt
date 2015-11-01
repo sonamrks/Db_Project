@@ -1,0 +1,118 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+
+
+public class RImagePanel2 extends JPanel{
+
+	private static final long serialVersionUID = 1L;
+    private Path2D currentShape;
+    private List<Path2D> lstPloys=new ArrayList<Path2D>();;
+    private Point lastPoint;
+    private Point currentPoint;
+    private Image img;
+    private boolean initialize = true;	
+	BufferedImage myPicture=null;
+    static int X, Y;
+    public ArrayList<Integer> values=new ArrayList<Integer>();
+	private static BufferedImage bI;
+
+	public RImagePanel2(){
+		
+	try {
+	myPicture = ImageIO.read(new File("/home/asahu/sonamHW3/HW3/map.JPG"));
+	}
+	catch (IOException ex) {
+        ex.getMessage();
+        
+    }
+	bI = (BufferedImage) myPicture;
+
+}	
+    public void addNotify() {
+        super.addNotify();
+        addMouseListener(new MouseAdapter(){
+        	    public void mouseClicked(MouseEvent e) {
+        	        if (e.getButton() == MouseEvent.BUTTON1) {
+        	                Point p = e.getPoint();
+               	         values.add(e.getX());
+            	         values.add(e.getY());
+        	                lastPoint = p;
+        	                if (currentShape == null) {
+        	                    currentShape = new Path2D.Float();
+        	                    currentShape.moveTo(p.x, p.y);
+        	                } else {
+        	                    currentShape.lineTo(p.x, p.y);
+        	                }
+        	                repaint();
+        	        }
+        	         if (e.getButton() == MouseEvent.BUTTON3) {
+        	                currentShape.closePath();
+        	                lstPloys.add(currentShape);
+        	                currentShape = null;
+        	                lastPoint = null;
+        	                repaint();
+        	        }
+        	      }
+        });
+    }
+    
+    public ArrayList<Integer> Values(){
+    	return values;
+    }
+   	
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+    	g.drawImage(myPicture,0,0,820,580,this);
+    	g.setColor(Color.yellow);
+    	
+        if(initialize){
+            img = (Image) createPolygon();
+            g.drawImage(img, 0, 0, null);
+        }     
+        }
+    
+    public BufferedImage createPolygon(){
+        Graphics2D g2d = bI.createGraphics();      
+        g2d.setColor(Color.black);
+
+
+        if (lastPoint != null) {
+            g2d.setColor(Color.RED);
+            g2d.fillOval(lastPoint.x - 2, lastPoint.y - 2, 4, 4);
+        }
+        if (currentShape != null) {
+            g2d.setColor(Color.RED);
+            g2d.draw(currentShape);
+            if (lastPoint != null && currentPoint != null) {
+                g2d.setColor(new Color(255, 0, 0, 64));
+                g2d.draw(new Line2D.Float(lastPoint, currentPoint));
+            }
+        }
+        g2d.setColor(Color.RED);
+        for (Shape shape : lstPloys) {
+            g2d.draw(shape);
+        }
+        g2d.dispose();
+        return bI;
+    }
+    
+}
+
+

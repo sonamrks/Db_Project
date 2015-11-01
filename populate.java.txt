@@ -1,0 +1,475 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class populate {
+        public static void main(String args[]){
+                if ( args.length > 0) {
+
+                try{
+                        Class.forName("oracle.jdbc.driver.OracleDriver");
+                }
+                catch(ClassNotFoundException ce){
+                        System.out.println("Error loading driver: " + ce);
+                }
+
+                try{
+                String host="dagobah.engr.scu.edu";
+                String dbname="db11g";
+                String username="asahu";
+                String password="SONIAJAZZ91";
+                int port=1521;
+                String URL="jdbc:oracle:thin:@" + host + ":" + port+ ":" + dbname;
+                Connection connection=DriverManager.getConnection(URL,username,password);
+
+                    String query1="SELECT COUNT(*) FROM my_Photographers";
+                    String query2="SELECT COUNT(*) FROM my_Photos";
+                    String query3="SELECT COUNT(*) FROM my_Buildings";
+                    
+                    String del1="DELETE FROM my_Photographers";
+                    String del2="DELETE FROM my_Photos";
+                    String del3="DELETE FROM my_Buildings";
+
+                    Statement s=connection.createStatement();   
+
+                PreparedStatement statement1=connection.prepareStatement("INSERT INTO my_Photographers VALUES(?, SDO_GEOMETRY( 2001, NULL, SDO_POINT_TYPE(?, ?, NULL), NULL, NULL))");
+                PreparedStatement statement2=connection.prepareStatement("INSERT INTO my_Photos VALUES(?, ?, SDO_GEOMETRY( 2001, NULL, SDO_POINT_TYPE(?, ?, NULL), NULL, NULL))");
+            
+                       try{
+                                         File file1 = new File(args[0]);
+                                         BufferedReader br1 = new BufferedReader(new InputStreamReader(new FileInputStream(file1)));
+                                         
+                                         ResultSet res1=s.executeQuery(query1);
+                                         int c1=0;
+                                         while(res1.next()){
+                                                 c1=res1.getInt(1);
+                                                                           }
+                                         
+                                         if(c1!=0) {
+                                                 s.executeUpdate(del1);
+                                                           }
+                                                                                         
+                                         String line1 = null;
+                                         while( (line1 = br1.readLine())!= null ){
+                                            Object [] tokens1 = line1.split(",\\s+");
+                                            String var_11 = (String)tokens1[0];
+                                            Integer var_12 = Integer.parseInt(String.valueOf(tokens1[1]));
+                                            Integer var_13 = Integer.parseInt(String.valueOf(tokens1[2]));
+                                            statement1.setString(1,var_11);
+                                            statement1.setInt(2,var_12);
+                                            statement1.setInt(3,var_13);
+                                            statement1.executeUpdate();
+                                                }
+                                            System.out.println("Photographers Populated");
+                                         br1.close();
+                                 }
+                                 catch(FileNotFoundException f){
+                                         System.out.println("File not found: " + f);
+                                 } catch (IOException e) {
+                                         e.printStackTrace();
+                             } 
+                       
+                       try{
+                                         File file2 = new File(args[1]);
+                                         BufferedReader br2 = new BufferedReader(new InputStreamReader(new FileInputStream(file2)));
+                                         
+                                         ResultSet res2=s.executeQuery(query2);
+                                         int c2=0;
+                                         while(res2.next()){
+                                                 c2=res2.getInt(1);
+                                         }
+                                         
+                                         if(c2!=0) {
+                                                 s.executeUpdate(del2);
+                                         }
+                                                                 
+                                         String line2 = null;
+                                         while( (line2 = br2.readLine())!= null ){
+                                                 Object [] tokens2 = line2.split(",\\s+");
+                                                 String var_21 = (String)tokens2[0];
+                                                 String var_22 = (String)tokens2[1];
+                                                 Integer var_23 = Integer.parseInt(String.valueOf(tokens2[2]));
+                                                 Integer var_24 = Integer.parseInt(String.valueOf(tokens2[3]));
+                                                 statement2.setString(1,var_21);
+                                                 statement2.setString(2,var_22);
+                                                 statement2.setInt(3,var_23);
+                                                 statement2.setInt(4,var_24);
+                                         statement2.executeUpdate();                                             
+                                                 }
+                                            System.out.println("Photos Populated");
+                                         br2.close();
+                                         }
+                                         catch(FileNotFoundException f){
+                                                 System.out.println("File not found: " + f);
+                                     } catch (IOException e) {
+                                                e.printStackTrace();
+                                         } 
+                       
+                       try{
+                                         File file3 = new File(args[2]);
+                                         BufferedReader br3 = new BufferedReader(new InputStreamReader(new FileInputStream(file3)));
+                                         
+                                         ResultSet res3=s.executeQuery(query3);
+                                         int c3=0;
+                                         while(res3.next()){
+                                                 c3=res3.getInt(1);
+                                         }
+                                         
+                                         if(c3!=0) {
+                                                 s.executeUpdate(del3);
+                                         }
+                                         
+                                         String line3 = null;
+                                         while( (line3 = br3.readLine())!= null ){
+                                            Object [] tokens3 = line3.split(",\\s+");
+                                            Integer temp = Integer.parseInt(String.valueOf(tokens3[2]));
+                                            
+                                            if(temp==4){
+                                                    PreparedStatement statement=connection.prepareStatement("INSERT INTO my_Buildings VALUES(?, ?, ?, SDO_GEOMETRY( 2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,2003,1), SDO_ORDINATE_ARRAY(?,?, ?,?, ?,?, ?,?, ?,?)))");                                                
+                                                    String var_1 = (String)tokens3[0];
+                                                    String var_2 = (String)tokens3[1];
+                                                    Integer var_3 = Integer.parseInt(String.valueOf(tokens3[2]));
+                                                    Integer var_4 = Integer.parseInt(String.valueOf(tokens3[3]));
+                                                    Integer var_5 = Integer.parseInt(String.valueOf(tokens3[4]));
+                                                    Integer var_6 = Integer.parseInt(String.valueOf(tokens3[5]));
+                                                    Integer var_7 = Integer.parseInt(String.valueOf(tokens3[6]));
+                                                    Integer var_8 = Integer.parseInt(String.valueOf(tokens3[7]));
+                                                    Integer var_9 = Integer.parseInt(String.valueOf(tokens3[8]));
+                                                    Integer var_10 = Integer.parseInt(String.valueOf(tokens3[9]));
+                                                    Integer var_11 = Integer.parseInt(String.valueOf(tokens3[10]));
+                                                  statement.setString(1,var_1);
+                                            statement.setString(2,var_2);
+                                            statement.setInt(3,var_3);
+                                            statement.setInt(4,var_4);
+                                            statement.setInt(5,var_5);
+                                            statement.setInt(6,var_6);
+                                            statement.setInt(7,var_7);
+                                            statement.setInt(8,var_8);
+                                            statement.setInt(9,var_9);
+                                            statement.setInt(10,var_10);
+                                            statement.setInt(11,var_11);
+                                            statement.setInt(12,var_4);
+                                            statement.setInt(13,var_5);
+                                            statement.executeUpdate();
+                                                }
+                                            
+                                            if(temp==6){
+                                                    PreparedStatement statement=connection.prepareStatement("INSERT INTO my_Buildings VALUES(?, ?, ?, SDO_GEOMETRY( 2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,2003,1), SDO_ORDINATE_ARRAY(?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?)))");                                              
+                                                    String var_1 = (String)tokens3[0];
+                                                    String var_2 = (String)tokens3[1];
+                                                    Integer var_3 = Integer.parseInt(String.valueOf(tokens3[2]));
+                                                    Integer var_4 = Integer.parseInt(String.valueOf(tokens3[3]));
+                                                    Integer var_5 = Integer.parseInt(String.valueOf(tokens3[4]));
+                                                    Integer var_6 = Integer.parseInt(String.valueOf(tokens3[5]));
+                                                    Integer var_7 = Integer.parseInt(String.valueOf(tokens3[6]));
+                                                    Integer var_8 = Integer.parseInt(String.valueOf(tokens3[7]));
+                                                    Integer var_9 = Integer.parseInt(String.valueOf(tokens3[8]));
+                                                    Integer var_10 = Integer.parseInt(String.valueOf(tokens3[9]));
+                                                    Integer var_11 = Integer.parseInt(String.valueOf(tokens3[10]));
+                                                    Integer var_12 = Integer.parseInt(String.valueOf(tokens3[11]));
+                                                    Integer var_13 = Integer.parseInt(String.valueOf(tokens3[12]));
+                                                    Integer var_14 = Integer.parseInt(String.valueOf(tokens3[13]));
+                                                    Integer var_15 = Integer.parseInt(String.valueOf(tokens3[14]));
+                                                 statement.setString(1,var_1);
+                                            statement.setString(2,var_2);
+                                            statement.setInt(3,var_3);
+                                            statement.setInt(4,var_4);
+                                            statement.setInt(5,var_5);
+                                            statement.setInt(6,var_6);
+                                            statement.setInt(7,var_7);
+                                            statement.setInt(8,var_8);
+                                            statement.setInt(9,var_9);
+                                            statement.setInt(10,var_10);
+                                            statement.setInt(11,var_11);
+                                            statement.setInt(12,var_12);
+                                            statement.setInt(13,var_13);
+                                            statement.setInt(14,var_14);
+                                            statement.setInt(15,var_15);
+                                            statement.setInt(16,var_4);
+                                            statement.setInt(17,var_5);
+                                            statement.executeUpdate();
+                                                }
+                                            
+                                            if(temp==8){
+                                                    PreparedStatement statement=connection.prepareStatement("INSERT INTO my_Buildings VALUES(?, ?, ?, SDO_GEOMETRY( 2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,2003,1), SDO_ORDINATE_ARRAY(?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?)))");                                                    
+                                                    String var_1 = (String)tokens3[0];
+                                                    String var_2 = (String)tokens3[1];
+                                                    Integer var_3 = Integer.parseInt(String.valueOf(tokens3[2]));
+                                                    Integer var_4 = Integer.parseInt(String.valueOf(tokens3[3]));
+                                                    Integer var_5 = Integer.parseInt(String.valueOf(tokens3[4]));
+                                                    Integer var_6 = Integer.parseInt(String.valueOf(tokens3[5]));
+                                                    Integer var_7 = Integer.parseInt(String.valueOf(tokens3[6]));
+                                                    Integer var_8 = Integer.parseInt(String.valueOf(tokens3[7]));
+                                                    Integer var_9 = Integer.parseInt(String.valueOf(tokens3[8]));
+                                                    Integer var_10 = Integer.parseInt(String.valueOf(tokens3[9]));
+                                                    Integer var_11 = Integer.parseInt(String.valueOf(tokens3[10]));
+                                                    Integer var_12 = Integer.parseInt(String.valueOf(tokens3[11]));
+                                                    Integer var_13 = Integer.parseInt(String.valueOf(tokens3[12]));
+                                                    Integer var_14 = Integer.parseInt(String.valueOf(tokens3[13]));
+                                                    Integer var_15 = Integer.parseInt(String.valueOf(tokens3[14]));
+                                                    Integer var_16 = Integer.parseInt(String.valueOf(tokens3[15]));
+                                                    Integer var_17 = Integer.parseInt(String.valueOf(tokens3[16]));
+                                                    Integer var_18 = Integer.parseInt(String.valueOf(tokens3[17]));
+                                                    Integer var_19 = Integer.parseInt(String.valueOf(tokens3[18]));
+                                                 statement.setString(1,var_1);
+                                            statement.setString(2,var_2);
+                                            statement.setInt(3,var_3);
+                                            statement.setInt(4,var_4);
+                                            statement.setInt(5,var_5);
+                                            statement.setInt(6,var_6);
+                                            statement.setInt(7,var_7);
+                                            statement.setInt(8,var_8);
+                                            statement.setInt(9,var_9);
+                                            statement.setInt(10,var_10);
+                                            statement.setInt(11,var_11);
+                                            statement.setInt(12,var_12);
+                                            statement.setInt(13,var_13);
+                                            statement.setInt(14,var_14);
+                                            statement.setInt(15,var_15);
+                                            statement.setInt(16,var_16);
+                                            statement.setInt(17,var_17);
+                                            statement.setInt(18,var_18);
+                                            statement.setInt(19,var_19);
+                                            statement.setInt(20,var_4);
+                                            statement.setInt(21,var_5);
+                                            statement.executeUpdate();
+                                                }
+                                            
+                                            if(temp==12){
+                                                    PreparedStatement statement=connection.prepareStatement("INSERT INTO my_Buildings VALUES(?, ?, ?, SDO_GEOMETRY( 2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,2003,1), SDO_ORDINATE_ARRAY(?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?)))");                                     
+                                                    String var_1 = (String)tokens3[0];
+                                                    String var_2 = (String)tokens3[1];
+                                                    Integer var_3 = Integer.parseInt(String.valueOf(tokens3[2]));
+                                                    Integer var_4 = Integer.parseInt(String.valueOf(tokens3[3]));
+                                                    Integer var_5 = Integer.parseInt(String.valueOf(tokens3[4]));
+                                                    Integer var_6 = Integer.parseInt(String.valueOf(tokens3[5]));
+                                                    Integer var_7 = Integer.parseInt(String.valueOf(tokens3[6]));
+                                                    Integer var_8 = Integer.parseInt(String.valueOf(tokens3[7]));
+                                                    Integer var_9 = Integer.parseInt(String.valueOf(tokens3[8]));
+                                                    Integer var_10 = Integer.parseInt(String.valueOf(tokens3[9]));
+                                                    Integer var_11 = Integer.parseInt(String.valueOf(tokens3[10]));
+                                                    Integer var_12 = Integer.parseInt(String.valueOf(tokens3[11]));
+                                                    Integer var_13 = Integer.parseInt(String.valueOf(tokens3[12]));
+                                                    Integer var_14 = Integer.parseInt(String.valueOf(tokens3[13]));
+                                                    Integer var_15 = Integer.parseInt(String.valueOf(tokens3[14]));
+                                                    Integer var_16 = Integer.parseInt(String.valueOf(tokens3[15]));
+                                                    Integer var_17 = Integer.parseInt(String.valueOf(tokens3[16]));
+                                                    Integer var_18 = Integer.parseInt(String.valueOf(tokens3[17]));
+                                                    Integer var_19 = Integer.parseInt(String.valueOf(tokens3[18]));
+                                                    Integer var_20 = Integer.parseInt(String.valueOf(tokens3[19]));
+                                                    Integer var_21 = Integer.parseInt(String.valueOf(tokens3[20]));
+                                                    Integer var_22 = Integer.parseInt(String.valueOf(tokens3[21]));
+                                                    Integer var_23 = Integer.parseInt(String.valueOf(tokens3[22]));                                 
+                                                    Integer var_24 = Integer.parseInt(String.valueOf(tokens3[23]));
+                                                    Integer var_25 = Integer.parseInt(String.valueOf(tokens3[24]));
+                                                    Integer var_26 = Integer.parseInt(String.valueOf(tokens3[25]));
+                                                    Integer var_27 = Integer.parseInt(String.valueOf(tokens3[26]));
+                                                statement.setString(1,var_1);
+                                            statement.setString(2,var_2);
+                                            statement.setInt(3,var_3);
+                                            statement.setInt(4,var_4);
+                                            statement.setInt(5,var_5);
+                                            statement.setInt(6,var_6);
+                                            statement.setInt(7,var_7);
+                                            statement.setInt(8,var_8);
+                                            statement.setInt(9,var_9);
+                                            statement.setInt(10,var_10);
+                                            statement.setInt(11,var_11);
+                                            statement.setInt(12,var_12);
+                                            statement.setInt(13,var_13);
+                                            statement.setInt(14,var_14);
+                                            statement.setInt(15,var_15);
+                                            statement.setInt(16,var_16);
+                                            statement.setInt(17,var_17);
+                                            statement.setInt(18,var_18);
+                                            statement.setInt(19,var_19);
+                                            statement.setInt(20,var_20);
+                                            statement.setInt(21,var_21);
+                                            statement.setInt(22,var_22);
+                                            statement.setInt(23,var_23);                            
+                                            statement.setInt(24,var_24);
+                                            statement.setInt(25,var_25);
+                                            statement.setInt(26,var_26);
+                                            statement.setInt(27,var_27);
+                                            statement.setInt(28,var_4);
+                                            statement.setInt(29,var_5);
+                                            statement.executeUpdate();
+                                                }
+
+                                            if(temp==14){
+                                                    PreparedStatement statement=connection.prepareStatement("INSERT INTO my_Buildings VALUES(?, ?, ?, SDO_GEOMETRY( 2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,2003,1), SDO_ORDINATE_ARRAY(?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?)))");                                            
+                                                    String var_1 = (String)tokens3[0];
+                                                    String var_2 = (String)tokens3[1];
+                                                    Integer var_3 = Integer.parseInt(String.valueOf(tokens3[2]));
+                                                    Integer var_4 = Integer.parseInt(String.valueOf(tokens3[3]));
+                                                    Integer var_5 = Integer.parseInt(String.valueOf(tokens3[4]));
+                                                    Integer var_6 = Integer.parseInt(String.valueOf(tokens3[5]));
+                                                    Integer var_7 = Integer.parseInt(String.valueOf(tokens3[6]));
+                                                    Integer var_8 = Integer.parseInt(String.valueOf(tokens3[7]));
+                                                    Integer var_9 = Integer.parseInt(String.valueOf(tokens3[8]));
+                                                    Integer var_10 = Integer.parseInt(String.valueOf(tokens3[9]));
+                                                    Integer var_11 = Integer.parseInt(String.valueOf(tokens3[10]));
+                                                    Integer var_12 = Integer.parseInt(String.valueOf(tokens3[11]));
+                                                    Integer var_13 = Integer.parseInt(String.valueOf(tokens3[12]));
+                                                    Integer var_14 = Integer.parseInt(String.valueOf(tokens3[13]));
+                                                    Integer var_15 = Integer.parseInt(String.valueOf(tokens3[14]));
+                                                    Integer var_16 = Integer.parseInt(String.valueOf(tokens3[15]));
+                                                    Integer var_17 = Integer.parseInt(String.valueOf(tokens3[16]));
+                                                    Integer var_18 = Integer.parseInt(String.valueOf(tokens3[17]));
+                                                    Integer var_19 = Integer.parseInt(String.valueOf(tokens3[18]));
+                                                    Integer var_20 = Integer.parseInt(String.valueOf(tokens3[19]));
+                                                    Integer var_21 = Integer.parseInt(String.valueOf(tokens3[20]));
+                                                    Integer var_22 = Integer.parseInt(String.valueOf(tokens3[21]));
+                                                    Integer var_23 = Integer.parseInt(String.valueOf(tokens3[22]));                                 
+                                                    Integer var_24 = Integer.parseInt(String.valueOf(tokens3[23]));
+                                                    Integer var_25 = Integer.parseInt(String.valueOf(tokens3[24]));
+                                                    Integer var_26 = Integer.parseInt(String.valueOf(tokens3[25]));
+                                                    Integer var_27 = Integer.parseInt(String.valueOf(tokens3[26]));
+                                                    Integer var_28 = Integer.parseInt(String.valueOf(tokens3[27]));
+                                                    Integer var_29 = Integer.parseInt(String.valueOf(tokens3[28]));
+                                                    Integer var_30 = Integer.parseInt(String.valueOf(tokens3[29]));
+                                                    Integer var_31 = Integer.parseInt(String.valueOf(tokens3[30]));
+                                                statement.setString(1,var_1);
+                                            statement.setString(2,var_2);
+                                            statement.setInt(3,var_3);
+                                            statement.setInt(4,var_4);
+                                            statement.setInt(5,var_5);
+                                            statement.setInt(6,var_6);
+                                            statement.setInt(7,var_7);
+                                            statement.setInt(8,var_8);
+                                            statement.setInt(9,var_9);
+                                            statement.setInt(10,var_10);
+                                            statement.setInt(11,var_11);
+                                            statement.setInt(12,var_12);
+                                            statement.setInt(13,var_13);
+                                            statement.setInt(14,var_14);
+                                            statement.setInt(15,var_15);
+                                            statement.setInt(16,var_16);
+                                            statement.setInt(17,var_17);
+                                            statement.setInt(18,var_18);
+                                            statement.setInt(19,var_19);
+                                            statement.setInt(20,var_20);
+                                            statement.setInt(21,var_21);
+                                            statement.setInt(22,var_22);
+                                            statement.setInt(23,var_23);                            
+                                            statement.setInt(24,var_24);
+                                            statement.setInt(25,var_25);
+                                            statement.setInt(26,var_26);
+                                            statement.setInt(27,var_27);
+                                            statement.setInt(28,var_28);
+                                            statement.setInt(29,var_29);
+                                            statement.setInt(30,var_30);
+                                            statement.setInt(31,var_31);
+                                            statement.setInt(32,var_4);
+                                            statement.setInt(33,var_5);
+                                            statement.executeUpdate();
+                                                }
+                                    
+                                            if(temp==16){
+                                                    PreparedStatement statement=connection.prepareStatement("INSERT INTO my_Buildings VALUES(?, ?, ?, SDO_GEOMETRY( 2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1,2003,1), SDO_ORDINATE_ARRAY(?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?, ?,?)))");                                  
+                                                    String var_1 = (String)tokens3[0];
+                                                    String var_2 = (String)tokens3[1];
+                                                    Integer var_3 = Integer.parseInt(String.valueOf(tokens3[2]));
+                                                    Integer var_4 = Integer.parseInt(String.valueOf(tokens3[3]));
+                                                    Integer var_5 = Integer.parseInt(String.valueOf(tokens3[4]));
+                                                    Integer var_6 = Integer.parseInt(String.valueOf(tokens3[5]));
+                                                    Integer var_7 = Integer.parseInt(String.valueOf(tokens3[6]));
+                                                    Integer var_8 = Integer.parseInt(String.valueOf(tokens3[7]));
+                                                    Integer var_9 = Integer.parseInt(String.valueOf(tokens3[8]));
+                                                    Integer var_10 = Integer.parseInt(String.valueOf(tokens3[9]));
+                                                    Integer var_11 = Integer.parseInt(String.valueOf(tokens3[10]));
+                                                    Integer var_12 = Integer.parseInt(String.valueOf(tokens3[11]));
+                                                    Integer var_13 = Integer.parseInt(String.valueOf(tokens3[12]));
+                                                    Integer var_14 = Integer.parseInt(String.valueOf(tokens3[13]));
+                                                    Integer var_15 = Integer.parseInt(String.valueOf(tokens3[14]));
+                                                    Integer var_16 = Integer.parseInt(String.valueOf(tokens3[15]));
+                                                    Integer var_17 = Integer.parseInt(String.valueOf(tokens3[16]));
+                                                    Integer var_18 = Integer.parseInt(String.valueOf(tokens3[17]));
+                                                    Integer var_19 = Integer.parseInt(String.valueOf(tokens3[18]));
+                                                    Integer var_20 = Integer.parseInt(String.valueOf(tokens3[19]));
+                                                    Integer var_21 = Integer.parseInt(String.valueOf(tokens3[20]));
+                                                    Integer var_22 = Integer.parseInt(String.valueOf(tokens3[21]));
+                                                    Integer var_23 = Integer.parseInt(String.valueOf(tokens3[22]));                                 
+                                                    Integer var_24 = Integer.parseInt(String.valueOf(tokens3[23]));
+                                                    Integer var_25 = Integer.parseInt(String.valueOf(tokens3[24]));
+                                                    Integer var_26 = Integer.parseInt(String.valueOf(tokens3[25]));
+                                                    Integer var_27 = Integer.parseInt(String.valueOf(tokens3[26]));
+                                                    Integer var_28 = Integer.parseInt(String.valueOf(tokens3[27]));
+                                                    Integer var_29 = Integer.parseInt(String.valueOf(tokens3[28]));
+                                                    Integer var_30 = Integer.parseInt(String.valueOf(tokens3[29]));
+                                                    Integer var_31 = Integer.parseInt(String.valueOf(tokens3[30]));
+                                                    Integer var_32 = Integer.parseInt(String.valueOf(tokens3[31]));
+                                                    Integer var_33 = Integer.parseInt(String.valueOf(tokens3[32]));
+                                                    Integer var_34 = Integer.parseInt(String.valueOf(tokens3[33]));
+                                                    Integer var_35 = Integer.parseInt(String.valueOf(tokens3[34]));
+                   			    statement.setString(1,var_1);
+                                            statement.setString(2,var_2);
+                                            statement.setInt(3,var_3);
+                                            statement.setInt(4,var_4);
+                                            statement.setInt(5,var_5);
+                                            statement.setInt(6,var_6);
+                                            statement.setInt(7,var_7);
+                                            statement.setInt(8,var_8);
+                                            statement.setInt(9,var_9);
+                                            statement.setInt(10,var_10);
+                                            statement.setInt(11,var_11);
+                                            statement.setInt(12,var_12);
+                                            statement.setInt(13,var_13);
+                                            statement.setInt(14,var_14);
+                                            statement.setInt(15,var_15);
+                                            statement.setInt(16,var_16);
+                                            statement.setInt(17,var_17);
+                                            statement.setInt(18,var_18);
+                                            statement.setInt(19,var_19);
+                                            statement.setInt(20,var_20);
+                                            statement.setInt(21,var_21);
+                                            statement.setInt(22,var_22);
+                                            statement.setInt(23,var_23);                            
+                                            statement.setInt(24,var_24);
+                                            statement.setInt(25,var_25);
+                                            statement.setInt(26,var_26);
+                                            statement.setInt(27,var_27);
+                                            statement.setInt(28,var_28);
+                                            statement.setInt(29,var_29);
+                                            statement.setInt(30,var_30);
+                                            statement.setInt(31,var_31);
+                                            statement.setInt(32,var_32);
+                                            statement.setInt(33,var_33);
+                                            statement.setInt(34,var_34);
+                                            statement.setInt(35,var_35);
+                                            statement.setInt(36,var_4);
+                                            statement.setInt(37,var_5);
+                                            statement.executeUpdate();
+                                                }
+                                         }  
+					System.out.println("Buildings Populated"); 
+                                         br3.close();
+                                         }
+                                         catch(FileNotFoundException f){
+                                                 System.out.println("File not found: " + f);
+                                     } catch (IOException e) {
+                                                e.printStackTrace();
+                                         } 
+                       
+            connection.close();
+                }
+                catch(SQLException E){
+                        System.out.println("SQLException: " + E.getMessage());
+                        System.out.println("SQLState: " + E.getSQLState());
+                        System.out.println("VendorError: " + E.getErrorCode());
+                }
+        }
+        else
+        System.out.println("Please enter the filename");
+
+        }
+}

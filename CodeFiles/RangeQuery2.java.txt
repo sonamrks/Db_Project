@@ -1,0 +1,131 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+public class RangeQuery2{
+	
+	public ArrayList<String> ids(String st) {
+
+		try{
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		}
+		catch(ClassNotFoundException ce){
+			System.out.println("Error loading driver: " + ce);
+		}
+		try{
+                String host="dagobah.engr.scu.edu";
+                String dbname="db11g";
+                String username="asahu";
+                String password="SONIAJAZZ91";
+                int port=1521;
+		String URL="jdbc:oracle:thin:@" + host + ":" + port+ ":" + dbname;
+		Connection connection=DriverManager.getConnection(URL,username,password);
+	    Statement statement=connection.createStatement();	
+	    ArrayList<String> at=new ArrayList<String>();
+		
+		String query="SELECT p.photo_id from my_photos p WHERE SDO_RELATE(p.shape,SDO_GEOMETRY(2003,NULL,NULL,SDO_ELEM_INFO_ARRAY(1,1003,1),SDO_ORDINATE_ARRAY(" + st + ")),'mask=anyinteract')='TRUE'";
+	    ResultSet resultset=statement.executeQuery(query);
+	    
+	    while(resultset.next()){
+	    	at.add(resultset.getString(1));
+	    }
+	    System.out.println("-" + at);
+	    connection.close();   
+	    return at;
+		}
+		catch(SQLException E){
+			System.out.println("SQLException: " + E.getMessage());
+			System.out.println("SQLState: " + E.getSQLState());
+			System.out.println("VendorError: " + E.getErrorCode());
+		}
+		return null;
+	}
+	
+	public ArrayList<Integer> Values(String ct) {
+		String[] tokens=null;
+		String st=ct;
+        ArrayList<Integer> values = new ArrayList<Integer>();
+
+		try{
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		}
+		catch(ClassNotFoundException ce){
+			System.out.println("Error loading driver: " + ce);
+		}
+		try{
+                String host="dagobah.engr.scu.edu";
+                String dbname="db11g";
+                String username="asahu";
+                String password="SONIAJAZZ91";
+                int port=1521;
+		String URL="jdbc:oracle:thin:@" + host + ":" + port+ ":" + dbname;
+		Connection connection=DriverManager.getConnection(URL,username,password);
+	    Statement statement=connection.createStatement();		
+		
+    	RangeQuery rq=new RangeQuery();
+  	  	ArrayList<String> s=rq.ids(st);
+  	  	for(String sn:s){
+		String query="SELECT p.shape.Get_WKT() FROM my_photos p WHERE p.photo_id='Photo" + sn + "'";
+	    ResultSet resultset=statement.executeQuery(query);
+	    
+	    while(resultset.next()){
+            InputStream ip = resultset.getAsciiStream(1);
+            BufferedReader br1 = new BufferedReader(new InputStreamReader(ip));
+			String c;
+            Integer[] points=new Integer[2];
+			try {
+				c = br1.readLine();
+		                tokens = c.split("\\s+");
+		                for (int i=1;i<=2;i++){
+		                	if(i==1){
+		                		String[] s1=tokens[i].split("[\\(]+");
+		                		tokens[1]=s1[1];
+		                	        }
+		                	if(i==2){
+		                		String s3[]=tokens[i].split("[\\)]+");
+		                		tokens[2]=s3[0];
+		                	        }
+		                }
+		                for (int a=1;a<=2;a++){
+			                		String[] a1=tokens[a].split("[\\.]+");
+			                		tokens[a]=a1[0];
+			            }
+		                
+						for (int b=1;b<=2;b++){
+		                	try {
+		                		Integer num=Integer.valueOf(tokens[b]);
+System.out.println(num);
+		                		points[b-1]=num;
+		                     	}
+		                    catch (NumberFormatException e) {
+		                    }
+						} 		            
+			            values.add(points[0]);
+			            values.add(points[1]);
+			            System.out.println("1" + values);
+				}
+		    catch (IOException e) {
+				e.printStackTrace();
+			} 
+ 	    }		
+ 	    }
+	    connection.close();
+		}
+		catch(SQLException E){
+			System.out.println("SQLException: " + E.getMessage());
+			System.out.println("SQLState: " + E.getSQLState());
+			System.out.println("VendorError: " + E.getErrorCode());
+		}
+		return values;
+	}
+
+}
+
+

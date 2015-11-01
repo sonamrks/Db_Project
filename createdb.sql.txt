@@ -1,0 +1,71 @@
+CREATE TABLE my_Buildings (
+ build_id VARCHAR2(32) PRIMARY KEY,
+ build_name VARCHAR2(32),
+ v_num NUMBER,
+ shape SDO_GEOMETRY);
+
+CREATE TABLE my_Photos (
+ photo_id VARCHAR2(10) PRIMARY KEY,
+ photographer_id VARCHAR2(10),
+ shape SDO_GEOMETRY);
+
+CREATE TABLE my_Photographers (
+ photographer_id VARCHAR2(10) PRIMARY KEY,
+ shape SDO_GEOMETRY);
+
+INSERT INTO USER_SDO_GEOM_METADATA
+ (TABLE_NAME,
+ COLUMN_NAME,
+ DIMINFO,
+ SRID)
+ VALUES (
+ 'my_Buildings',
+ 'shape',
+ SDO_DIM_ARRAY(
+ SDO_DIM_ELEMENT('X', 0, 800, 0.005),
+ SDO_DIM_ELEMENT('Y', 0, 800, 0.005)
+ ),
+ NULL
+);
+
+INSERT INTO USER_SDO_GEOM_METADATA
+ (TABLE_NAME,
+ COLUMN_NAME,
+ DIMINFO,
+ SRID)
+ VALUES (
+ 'my_Photos',
+ 'shape',
+ SDO_DIM_ARRAY(
+ SDO_DIM_ELEMENT('X', 0, 800, 0.005),
+ SDO_DIM_ELEMENT('Y', 0, 800, 0.005)
+ ),
+ NULL
+);
+
+INSERT INTO USER_SDO_GEOM_METADATA
+ (TABLE_NAME,
+ COLUMN_NAME,
+ DIMINFO,
+ SRID)
+ VALUES (
+ 'my_Photographers',
+ 'shape',
+ SDO_DIM_ARRAY(
+ SDO_DIM_ELEMENT('X', 0, 800, 0.005),
+ SDO_DIM_ELEMENT('Y', 0, 800, 0.005)
+ ),
+ NULL
+);
+
+CREATE INDEX Index_my_Buildings
+ ON my_Buildings(shape)
+ INDEXTYPE IS MDSYS.SPATIAL_INDEX;
+
+CREATE INDEX Index_my_Photos
+ ON my_Photos(shape)
+ INDEXTYPE IS MDSYS.SPATIAL_INDEX;
+
+CREATE INDEX Index_my_Photographers
+ ON my_Photographers(shape)
+ INDEXTYPE IS MDSYS.SPATIAL_INDEX;
